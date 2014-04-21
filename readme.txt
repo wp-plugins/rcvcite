@@ -45,10 +45,10 @@ You can find more information about this plugin and the RcVCite browser extensio
 
 == Changelog ==
 
-= 0.3.2014.04.12.1635 =
+= 0.3.14.412.16 =
 * First published release
 
 == Upgrade Notice ==
 
-= 0.3.2014.04.12.1635 =
+= 0.3.14.412.16 =
 This is the first version of RcVCite for Wordpress.
