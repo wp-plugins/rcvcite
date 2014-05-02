@@ -36,11 +36,7 @@ if(typeof RcVCite === 'undefined'){
             return true;
         };
         this._cache={};
-        this._version="201404121720";
-        
-        function escapeHTML(string){
-            return string.replace?string.replace(/[>]/g,'&gt;').replace(/[<]/g,'&lt;'):'';
-        }
+        this._version="201405012223";
         
         /** function which searches the contents of an html dom node, jquery object,
          * or the document for verse references and wraps them with spans 
@@ -62,7 +58,7 @@ if(typeof RcVCite === 'undefined'){
                 }
                 var start = (new Date()).getTime();
                 var prefix='chapters?\\s*|chap\\.\\s+|ch\\.\\s+|verses?\\s*|vv?\\.\\s+';
-                var excludePattern='([0-9]{1,2}:[0-9]{2}\\s*(-|through)\\s*)[0-9]{1,2}:[0-9]{2}\\s*[ap][m](?![a-z])|[0-9]{1,2}(:[0-9]{1,2}){2,}|[a-uw-z]v\.';
+                var excludePattern='([0-9]{1,2}:[0-9]{2}\\s*(-|through)\\s*)?[0-9]{1,2}:[0-9]{2}\\s*[ap][m](?![a-z])|[0-9]{1,2}(:[0-9]{1,2}){2,}|[a-uw-z]v\.';
                 var singleVersePattern = '('+prefix+')?([1-9][0-9]*:)?([1-9][0-9]*[a-z]?((-|\\s*through\\s*)[1-9][0-9]*)?[a-z]?)';
                 var versePattern = '('+prefix+')?([1-9][0-9]*:)?(([1-9][0-9]*[a-z]?((-|\\s*through\\s*)[1-9][0-9]*)?[a-z]?)(\\,?\\s*(and\\s*)?([1-9][0-9]*[a-z]?((-|\\s*through\\s*)[1-9][0-9]*)?[a-z]?))*)(?![0-9]*:[0-9])';
                 var firstVersePattern = '^\\s*('+prefix+')?([1-9][0-9]*:)?(([1-9][0-9]*[a-z]?((-|\\s*through\\s*)[1-9][0-9]*)?[a-z]?)(\\,?\\s*(and\\s*)?([1-9][0-9]*[a-z]?((-|\\s*through\\s*)[1-9][0-9]*)?[a-z]?))*(?![0-9]*:[0-9]))';
@@ -75,8 +71,9 @@ if(typeof RcVCite === 'undefined'){
                 
                 //find refs and wrap them with a tag
                 var lastBook, lastChapter;
-                var bookRegex = getBookRegex('i');
+                var bookRegex = getBookRegex('m');
                 function process_text_node(node){
+                    var node_ = $(node);
                     var nodeValue = node.nodeValue, processedContent='';
                     var bookMatch = nodeValue.match(bookRegex), excludeMatch, book=undefined, nextBook=lastBook, verseMatch;
                     var isFirst; //flag to check if this is a verse immediately following a book
@@ -135,11 +132,29 @@ if(typeof RcVCite === 'undefined'){
                                     lastChapter=chapter;
                                     vfirst=false;
                                     if(isFirst){
-                                        processedContent+="<span class='rcvc_verse_ref inactive' book='"+lastBook[1]+"' chapter='"+lastChapter+"' verse='"+verse+"'>"+lastBook[3]+verseStr.substring(0,verseMatch.index)+verseMatch[0]+"</span>";
+                                        node_.before(document.createTextNode(processedContent+lastBook[3][1]));
+                                        processedContent='';
+                                        
+                                        var wrapper = document.createElement('span');
+                                        wrapper.className='rcvc_verse_ref inactive';
+                                        wrapper.setAttribute('book',lastBook[1]);
+                                        wrapper.setAttribute('chapter',lastChapter);
+                                        wrapper.setAttribute('verse',verse);
+                                        wrapper.appendChild(document.createTextNode(lastBook[3][2]+verseStr.substring(0,verseMatch.index)+verseMatch[0]));
+                                        node_.before(wrapper);
                                         isFirst=0;
                                         numTagged++;
                                     }else{
-                                        processedContent+=escapeHTML(verseStr.substring(0,verseMatch.index))+"<span class='rcvc_verse_ref inactive' book='"+lastBook[1]+"' chapter='"+lastChapter+"' verse='"+verse+"'>"+verseMatch[0]+"</span>";
+                                        node_.before(document.createTextNode(processedContent+verseStr.substring(0,verseMatch.index)));
+                                        processedContent='';
+                                        
+                                        var wrapper = document.createElement('span');
+                                        wrapper.className='rcvc_verse_ref inactive';
+                                        wrapper.setAttribute('book',lastBook[1]);
+                                        wrapper.setAttribute('chapter',lastChapter);
+                                        wrapper.setAttribute('verse',verse);
+                                        wrapper.appendChild(document.createTextNode(verseMatch[0]));
+                                        node_.before(wrapper);
                                         numTagged++;
                                     }
                                 } else {
@@ -155,17 +170,17 @@ if(typeof RcVCite === 'undefined'){
                                         }
                                     }
                                     if(isFirst){
-                                        processedContent+=escapeHTML(lastBook[3]+verseStr.substring(0,verseMatch.index)+verseMatch[0]);
+                                        processedContent+=lastBook[3][0]+verseStr.substring(0,verseMatch.index)+verseMatch[0];
                                         isFirst=0;
                                     }else{
-                                        processedContent+=escapeHTML(verseStr.substring(0,verseMatch.index)+verseMatch[0]);
+                                        processedContent+=verseStr.substring(0,verseMatch.index)+verseMatch[0];
                                     }                                
                                 }
                                 verseStr=verseStr.substr(vrsIndex);
                                 verseMatch=verseStr.match(singleVerseRegex);
                             }
                         }
-                        processedContent+=escapeHTML(verseStr);
+                        processedContent+=verseStr;
                     }
                     function verseSearch(verseStr){
                         var vrsIndex;
@@ -181,14 +196,14 @@ if(typeof RcVCite === 'undefined'){
                                 lastBook=nextBook;
                                 lastChapter=1;
                             }
-                            if(isFirst===true&&nextBook)processedContent+=nextBook[3];
+                            if(isFirst===true&&nextBook)processedContent+=nextBook[3][0];
                             verseMatch=verseStr.match(verseRegex);
                             isFirst=false;
                         }
                         while(verseMatch){
                             vrsIndex=verseMatch[0].length+verseMatch.index;
                             if(!isFirst){
-                                processedContent+=escapeHTML(verseStr.substring(0,verseMatch.index));
+                                processedContent+=verseStr.substring(0,verseMatch.index);
                             }
                             verseParse(verseMatch[0]);
                             lastIndex+=vrsIndex;
@@ -204,11 +219,11 @@ if(typeof RcVCite === 'undefined'){
                             verseSearch(vrsStr=searchStr.substring(0,excludeMatch.index));
                             rem=vrsStr.length-lastIndex+locIndex;
                             if(locIndex===lastIndex){
-                                processedContent+=escapeHTML(vrsStr);
+                                processedContent+=vrsStr;
                                 lastIndex+=excludeMatch.index;
                             } else if(rem>0) {
                                 lastIndex+=rem;
-                                processedContent+=escapeHTML(vrsStr.slice(-rem));
+                                processedContent+=vrsStr.slice(-rem);
                             }
                             lastIndex+=excludeMatch[0].length;
                             processedContent+=excludeMatch[0];
@@ -220,10 +235,10 @@ if(typeof RcVCite === 'undefined'){
                     }
                     while(bookMatch){ //this uses a pipelined approach, book matches are found and tested, then the previous match is processed.
                         nextBook=book;
-                        book=getBook(bookMatch[0],true);
+                        book=getBook(bookMatch[2],true);
                         book[2]=book[0][book[1]]; //book now looks like [OT/NT shortCode Object]
-                        book[3]=bookMatch[0]; //book now looks like [OT/NT shortCode Object bookMatch[0]]
-                        processedContent+=escapeHTML(nodeValue.substring(lastIndex,index-(nextBook?nextBook[3].length:0)));
+                        book[3]=bookMatch; //book now looks like [OT/NT shortCode Object bookMatch[2]]
+                        processedContent+=nodeValue.substring(lastIndex,index-(nextBook?nextBook[3][0].length:0));
                         lastIndex=index;
                         index+=bookMatch[0].length+bookMatch.index;
                         exclusionSearch(nodeValue.substring(lastIndex,index-bookMatch[0].length));
@@ -232,13 +247,15 @@ if(typeof RcVCite === 'undefined'){
                         bookMatch = remainderStr.match(bookRegex);
                     }
                     nextBook=book;
-                    processedContent+=escapeHTML(nodeValue.substring(lastIndex,index-(nextBook?nextBook[3].length:0)));
+                    processedContent+=nodeValue.substring(lastIndex,index-(nextBook?nextBook[3][0].length:0));
                     lastIndex=index;
                     exclusionSearch(nodeValue.substr(lastIndex));
-                    processedContent+=escapeHTML(nodeValue.substr(lastIndex));
+                    processedContent+=nodeValue.substr(lastIndex);
                     //console.log(nodeValue,'proc:',processedContent);
-                    if(numTagged>0)
-                        $(node).replaceWith(processedContent);
+                    if(numTagged>0){
+                        node_.before(document.createTextNode(processedContent));
+                        node.parentNode.removeChild(node);
+                    }
                 }
                 
                 //inorder traversesal of HTML DOM tree
@@ -276,7 +293,25 @@ if(typeof RcVCite === 'undefined'){
                         var book_obj = NT[book]?NT[book]:OT[book];
                         var url = book_obj['index']+'_'+(book_obj['name'].replace(/([1-3]) /g,'$1'))+chapter+'.htm#'+chapter+':'+parseInt(verse);
                         if(overlay) return;
-                        overlay = $('<div class="rcvc_verse_overlay '+parent.extraClass+'" style="position:absolute">'+content+'<div class="rcvc_verse_overlay_links"><a href="http://online.recoveryversion.org/txo/'+url+'" target="_blank">See More</a></div></div>').hide().appendTo(this_);
+                        
+                        var o_div = document.createElement('div');
+                        o_div.className='rcvc_verse_overlay '+parent.extraClass;
+                        o_div.setAttribute('style','position:absolute');
+                        if(content!=="")
+                            o_div.appendChild(document.createTextNode(content));
+                        
+                        var o_links_div = document.createElement('div');
+                        o_links_div.className='rcvc_verse_overlay_links';
+                                                
+                        var o_links_a = document.createElement('a');
+                        o_links_a.setAttribute('href','http://online.recoveryversion.org/txo/'+url);
+                        o_links_a.setAttribute('target','_blank');
+                        o_links_a.appendChild(document.createTextNode('See More'));
+                        
+                        //overlay = $('<div class="rcvc_verse_overlay '+parent.extraClass+'" style="position:absolute">'+content+'<div class="rcvc_verse_overlay_links"><a href="http://online.recoveryversion.org/txo/'+url+'" target="_blank">See More</a></div></div>').hide().appendTo(this_);
+                        o_links_div.appendChild(o_links_a);
+                        o_div.appendChild(o_links_div);
+                        overlay = $(o_div).hide().appendTo(this_);
                         overlay.click(function(event){
                             event.stopPropagation();
                         });
@@ -287,13 +322,24 @@ if(typeof RcVCite === 'undefined'){
                             var data_=$(data);
                             var vrs_array=data_.find('verse').get().reverse();
                             overlay.find('.error').remove();
-                            overlay.append('<div class="rcvc_copyright">'+
-                                escapeHTML(data_.find('copyright').text())+'</div>');
+                            var cpy_div = document.createElement('div');
+                            cpy_div.className='rcvc_copyright';
+                            cpy_div.appendChild(document.createTextNode(data_.find('copyright').text()));
+                            overlay.append(cpy_div);
                             for(var vrs in vrs_array){
                                 var verse_=$(vrs_array[vrs]);
-                                overlay.prepend('<div class="rcvc_verse"><span class="rcvc_ref">'+
-                                    escapeHTML(verse_.find('ref').text())+'</span> '+
-                                    escapeHTML(verse_.find('text').text())+'</div>');
+                                
+                                var vrs_div = document.createElement('div');
+                                vrs_div.className='rcvc_verse';
+                                
+                                var ref_span = document.createElement('span');
+                                ref_span.className='rcvc_ref';
+                                ref_span.appendChild(document.createTextNode(verse_.find('ref').text()));
+                                
+                                vrs_div.appendChild(ref_span);
+                                vrs_div.appendChild(document.createTextNode(' '+verse_.find('text').text()));
+                                
+                                overlay.prepend(vrs_div);
                             };
                             isSet=true;
                             if(timer===null){
@@ -306,7 +352,21 @@ if(typeof RcVCite === 'undefined'){
                                 'data':{'String':query_string},
                                 'dataType':'xml',
                                 'error':function(jqXHR,textStatus,errorThrown ){
-                                    overlay.append('<div class="rcvc_verse error"><span class="rcvc_ref">Error:</span> Unable to contact the Online Recovery Version API.</div><div class="rcvc_copyright error"><br></div>');
+                                    var vrs_div = document.createElement('div');
+                                    vrs_div.className='rcvc_verse error';
+
+                                    var ref_span = document.createElement('span');
+                                    ref_span.className='rcvc_ref';
+                                    ref_span.appendChild(document.createTextNode('Error:'));
+                                    
+                                    var cpy_div = document.createElement('div');
+                                    cpy_div.className='rcvc_copyright error';
+                                    cpy_div.appendChild(document.createElement('br'));
+
+                                    vrs_div.appendChild(ref_span);
+                                    vrs_div.appendChild(document.createTextNode(' Unable to contact the Online Recovery Version API.'));
+                                    vrs_div.appendChild(cpy_div);
+                                    overlay.append(vrs_div);
                                     isSet=true;
                                     if(timer===null){
                                         onShow();

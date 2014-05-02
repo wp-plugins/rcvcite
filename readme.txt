@@ -8,20 +8,24 @@ Stable tag: trunk
 License: MIT
 License URI: http://opensource.org/licenses/MIT
 
-RcVCite displays the content of a verse when you click on a reference or your mouse moves over the reference.
+RcVCite displays the content of a verse when you click on a reference or your
+mouse moves over the reference.
 
 == Description ==
 
 [RcVCite Homepage.](http://rcvcite.net)
 
-RcVCite makes looking up bible verses on a website or blog fast and easy.
-It is a Bible verse reference processor that locates verse references on any webpage.
-It displays the content of that verse when you click on a reference or your mouse moves over the reference.
+RcVCite makes looking up bible verses on a website or blog fast and easy. It is
+a Bible verse reference processor that locates verse references on any webpage.
+It displays the content of that verse when you click on a reference or your
+mouse moves over the reference.
 
-RcVCite retrieves verses by accessing a public API for the Text Only Edition of the Holy Bible Recovery Version published by Living Stream Ministry, Anaheim, CA;
-the terms of use for this API may be viewed here.
+RcVCite retrieves verses by accessing a public API for the Text Only Edition of
+the Holy Bible Recovery Version published by Living Stream Ministry, Anaheim,
+CA;
 
-RcVCite is in public beta which means it still may have problems to be worked out, but it is available for anyone to use.
+RcVCite is in public beta which means it still may have problems to be worked
+out, but it is available for anyone to use.
 
 == Installation ==
 
@@ -36,7 +40,8 @@ To install this plugin:
 = Where can I find more information about RcVCite? =
 
 RcVCite's homepage is [http://rcvcite.net](http://rcvcite.net).
-You can find more information about this plugin and the RcVCite browser extensions there.
+You can find more information about this plugin and the RcVCite browser
+extensions there.
 
 == Screenshots ==
 
@@ -45,10 +50,23 @@ You can find more information about this plugin and the RcVCite browser extensio
 
 == Changelog ==
 
-= 0.3.14.412.16 =
+= 0.3.14.501.22 =
+* There were several under-the-hood changes to make the Mozilla reviewers happy.
+  Also, the book name matching was changed back to case sensitive and new
+  matching rules were added for all caps.
+* This was necessary because with all lowercase there were too many false
+  positives.
+* An error message was added for the case when the text-only Online Recovery
+  Version API is unreachable.
+
+= 0.3.14.421.16 =
 * First published release
 
 == Upgrade Notice ==
+
+= 0.3.14.501.22 =
+This update fixes several bugs, updating is recommended. See the changelog for
+details.
 
 = 0.3.14.412.16 =
 This is the first version of RcVCite for Wordpress.

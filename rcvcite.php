@@ -6,7 +6,7 @@
 Plugin Name: RcVCite
 Plugin URI: http://pcajc.homelinux.com/test/RcVCite
 Automatic bible verse overlays for Wordpress.
-Version: 0.3.14.412.16
+Version: 0.3.14.501.22
 Author: support@rcvcite.net
 Author URI: http://rcvcite.net
 License: MIT
