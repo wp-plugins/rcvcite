@@ -261,11 +261,11 @@ if(typeof RcVCite === 'undefined'){
                 //inorder traversesal of HTML DOM tree
                 function walk_node_tree(node){
                     if(node.nodeType===3){
-                        if(!node.nodeName.match(/^iframe|script|style$/))
+                        if(!node.nodeName.match(/^iframe|script|style|font$/))
                             process_text_node(node);
                     } else {
                         for(var child_no=0; child_no<node.childNodes.length; child_no++)
-                            if(parent.ignoreFilter(node)&&(!node.className||node.className.indexOf('rcvc_verse_ref')===-1))
+                            if(parent.ignoreFilter(node)&&(!node.className||node.className.indexOf('rcvc_verse_ref')===-1)&&(!node.nodeName.match(/^iframe|script|style|font$/i)))
                                 walk_node_tree(node.childNodes[child_no]);
                     }
                 }
