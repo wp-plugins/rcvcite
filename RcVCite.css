@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.*/
 
 span.rcvc_verse_ref{
+    display: inline;
     color: blue;
     cursor: pointer;
 }

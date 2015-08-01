@@ -3,7 +3,7 @@ Contributors: RcVCite
 Donate link: NA
 Tags: Bible verse, verse lookup, verse reference
 Requires at least: 3.0
-Tested up to: 4.1
+Tested up to: 4.2.3
 Stable tag: trunk
 License: MIT
 License URI: http://opensource.org/licenses/MIT
@@ -49,6 +49,9 @@ extensions there.
 1. The RcVCite Settings page.
 
 == Changelog ==
+
+= 0.3.15.731.17 =
+* Added support for HTTPS.
 
 = 0.3.14.501.22 =
 * There were several under-the-hood changes to make the Mozilla reviewers happy.

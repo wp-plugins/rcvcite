@@ -36,7 +36,7 @@ if(typeof RcVCite === 'undefined'){
             return true;
         };
         this._cache={};
-        this._version="201405012223";
+        this._version="201507301933";
         
         /** function which searches the contents of an html dom node, jquery object,
          * or the document for verse references and wraps them with spans 
@@ -265,7 +265,7 @@ if(typeof RcVCite === 'undefined'){
                             process_text_node(node);
                     } else {
                         for(var child_no=0; child_no<node.childNodes.length; child_no++)
-                            if(parent.ignoreFilter(node)&&(!node.className||node.className.indexOf('rcvc_verse_ref')===-1)&&(!node.nodeName.match(/^iframe|script|style|font$/i)))
+                            if(parent.ignoreFilter(node)&&(!node.className||(node.className+'').indexOf('rcvc_verse_ref')===-1)&&(!node.nodeName.match(/^iframe|script|style|font$/i)))
                                 walk_node_tree(node.childNodes[child_no]);
                     }
                 }
@@ -348,7 +348,11 @@ if(typeof RcVCite === 'undefined'){
                         };
                         if(typeof parent._cache[query_string]==='undefined'){
                             console.log("RcVCite: Looking up "+query_string);
-                            $.ajax('http://api.lsm.org/recver.php',{
+                            var protocol = 'http:';
+                            if(window.location.protocol === "https:"){
+                                protocol = 'https:'
+                            }
+                            $.ajax(protocol+'//api.lsm.org/recver.php',{
                                 'data':{'String':query_string},
                                 'dataType':'xml',
                                 'error':function(jqXHR,textStatus,errorThrown ){
